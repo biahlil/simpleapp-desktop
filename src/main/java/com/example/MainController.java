@@ -1,31 +1,30 @@
 package com.example;
 
-import org.assertj.core.internal.Integers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.*;
+import javafx.scene.control.Button;
+
+import java.io.StringWriter;
+
 import org.json.*;
+import com.google.api.client.http.*;
+import com.google.api.client.http.javanet.NetHttpTransport;
+
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.InputEvent;
-import javafx.scene.*;
 
 public class MainController {
     
-    // @FXML
-    // public Label manipulasi;
-    // @FXML
-    // private TextField kodeBarang;
     @FXML
-    private TextField namaBarang;
-
-    // @FXML
-    // private TextField jumlah;
-    // @FXML
-    // private TextField harga;
+    private TextField inputKodeProduk;
+    @FXML
+    private TextField inputNamaProduk;
+    @FXML
+    private TextField inputJumlah;
+    @FXML
+    private TextField inputHarga;
+    @FXML
+    private TextField inputSearch;
     
     @FXML
     private Button buttonInsert;
@@ -37,46 +36,37 @@ public class MainController {
     // private Button buttonSearch;
     
     
-    // String sample = "test";
+     Integer sample = 0;
 
-    // public void addToTextField(ActionEvent event) {
-        // namabarang.setText(sample);
-    // }
-    
-    // public void findToDatabase(ActionEvent event) {
-    //     OkHttpClient client = new OkHttpClient();
-    //     Request req = new   Request.Builder()
-    //     .url("http://localhost:8081/barang").build();
-
-    //     try {
-    //         Response resp = client.newCall(req).execute();
-    //         // JSONObject respobj = new JSONObject(resp.body());
-            // String jsoString = respobj.toString();
-        //     JSONArray arrJson = new JSONArray(resp.body());
-        // } catch (Exception e) {
-        //     // TODO: handle exception
-        // }
-
-        // public void insertToDatabase(ActionEvent event) {
-        //     OkHttpClient client = new OkHttpClient();
-
-        //     String jsonString =  "\n + \"namaBarang\": \"" + namaBarang.getText() + "\"," +  \n" +
-        //     "\n + \"jumlah\": \"" + jumlah.getText() + "\"," +  \n" +
-        //     "\n + \"harga\": \"" + harga.getText() + "\"," +  \n" +
-        //     "\n + \"kodeBarang\": \"" + kodeBarang.getText() + "\"";
-        //     RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),jsonString);
-        //     Request req = new   Request.Builder()
-        //         .url("http://localhost:8081/barang/add")
-        //         .post(body).build();
-
-        //     try {
-        //         Response resp = client.newCall(req).execute();
-        //         ////Dump Json
-        //         JSONArray arrJson = new JSONArray(resp.body());
-        //         for
-        //     } catch (Exception e) {
-        //         // TODO: handle exception
-        //     }
-        // }
-    // }
+    @FXML
+    public void onInsert(ActionEvent event) {
+            String tmpkode = inputKodeProduk.getText();
+            String tmpnama = inputNamaProduk.getText();
+            int tmpjumlah = Integer.parseInt(inputJumlah.getText());
+            int tmpharga = Integer.parseInt(inputHarga.getText());
+            StringWriter stringJson = new StringWriter();
+            JSONWriter writer = new JSONWriter(stringJson)
+                .object()
+                    .key("kodeBarang").value(tmpkode)
+                    .key("namaBarang").value(tmpnama)
+                    .key("jumlah").value(tmpjumlah)
+                    .key("harga").value(tmpharga)
+                .endObject();
+                    inputSearch.setText(stringJson.toString());
+        HttpTransport httpTransport = new NetHttpTransport();
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
+        HttpContent content = ByteArrayContent.fromString("application/json", stringJson.toString());
+        GenericUrl url = new GenericUrl("http://localhost:8081/barang/add");
+        try {
+                    HttpRequest request = requestFactory.buildPostRequest(url, content);
+                    HttpResponse response = request.execute();
+            
+                    System.out.println(response.getStatusCode());
+                    System.out.println(response.parseAsString());
+            
+                    response.disconnect();
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+    }
 }

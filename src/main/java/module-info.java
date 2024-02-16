@@ -1,11 +1,11 @@
 module com.example {
     requires javafx.controls;
     requires javafx.fxml;
-    requires javafx.base;
-    requires javafx.graphics;
+    requires transitive javafx.base;
+    requires transitive javafx.graphics;
     requires org.json;
     requires org.assertj.core;
-    requires okhttp3;
+    requires com.google.api.client;
 
     opens com.example to javafx.fxml;
     exports com.example;
